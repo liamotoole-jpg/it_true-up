@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>IT True Up Process</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script>
+        function showProcessing() {
+            document.getElementById('uploadForm').style.display = 'none';
+            document.getElementById('statusMessage').style.display = 'block';
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const dropZone = document.getElementById("drop-zone");
+            const fileInput = document.getElementById("fileInput");
+            const fileName = document.getElementById("file-name");
+        
+            dropZone.addEventListener("click", () => fileInput.click());
+            dropZone.addEventListener("dragover", (e) => { e.preventDefault(); dropZone.classList.add("dragover"); });
+            dropZone.addEventListener("dragleave", () => dropZone.classList.remove("dragover"));
+            dropZone.addEventListener("drop", (e) => {
+                e.preventDefault();
+                dropZone.classList.remove("dragover");
+                fileInput.files = e.dataTransfer.files;
+                fileName.textContent = e.dataTransfer.files[0].name;
+            });
+            fileInput.addEventListener("change", () => { fileName.textContent = fileInput.files[0].name; });
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="logo-container">
+            <img src="{{ url_for('static', filename='logo.webp') }}" alt="Convergence Media Logo">
+        </div>
+
+        <h2>IT True Up Process</h2>
+
+        {% if status == 'ready' %}
+            <div class="download-message">
+                <p>File processed successfully! <a href="{{ download_url }}">Click here to download</a></p>
+                <p>After downloading, <a href="{{ url_for('index') }}">click here to process another file</a>.</p>
+            </div>
+        {% else %}
+            <div id="statusMessage" style="display:none;">
+                <p>File is being processed. Please wait...</p>
+            </div>
+
+            <form id="uploadForm" method="POST" enctype="multipart/form-data" onsubmit="showProcessing()">
+                <div class="form-row">
+                    <div id="drop-zone" style="width: 100%;">
+                        <p>Drag & drop a CSV file here<br>or click to select</p>
+                        <input type="file" name="file" id="fileInput" accept=".csv" required>
+                    </div>
+                    <span id="file-name"></span>
+                </div>
+                <input type="submit" value="Process File">
+            </form>
+        {% endif %}
+    </div>
+</body>
+</html>
